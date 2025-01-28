@@ -1,0 +1,41 @@
+# Maven build directory
+/target/
+
+# Compiled class files
+*.class
+
+# Log files
+*.log
+logs/
+
+# Temporary files
+*.tmp
+
+# Environment variables and sensitive configuration
+.env
+
+# IntelliJ IDEA files
+/.idea/
+/*.iml
+*.iws
+
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Eclipse or other IDEs (if used)
+*.project
+*.classpath
+.csettings/
+.settings/
+
+# JRebel temp files
+*.rebel.xml
+
+# Maven dependencies folder (optional, if you don’t want to cache dependencies)
+.mvn/
+
+mvnw.cmd
+mvnw
+HELP.md
