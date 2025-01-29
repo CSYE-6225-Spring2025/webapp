@@ -12,14 +12,19 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Instant;
+
 @RestController
 public class HealthCheckController {
 
     @Autowired()
     private HealthCheckRepository repository;
 
-    @GetMapping(path = "/healths")
-    public ResponseEntity<Void> healthCheck() {
+    @GetMapping(path = "/healthz")
+    public ResponseEntity<Void> healthCheck(HttpServletRequest httpServletRequest) {
+        if (httpServletRequest.getContentLength() > 0){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("Cache-Control", "no-cache, no-store, must-revalidate").build();
+        }
             try {
                 repository.save(new HealthCheck());
             } catch (Exception e) {

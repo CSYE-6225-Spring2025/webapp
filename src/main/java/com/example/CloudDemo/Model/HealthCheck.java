@@ -1,6 +1,9 @@
 package com.example.CloudDemo.Model;
+
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+
+import java.time.Instant;
+
 @Entity
 @Table(name = "health_check")
 public class HealthCheck {
@@ -9,17 +12,17 @@ public class HealthCheck {
     private Long checkId;
 
     @Column(nullable = false)
-    private LocalDateTime datetime;
+    private Instant datetime;
 
     public HealthCheck() {
-        this.datetime = LocalDateTime.now();
+        this.datetime = Instant.now();
     }
 
     public Long getCheckId() {
         return checkId;
     }
 
-    public LocalDateTime getDatetime() {
+    public Instant getDatetime() {
         return datetime;
     }
 }
