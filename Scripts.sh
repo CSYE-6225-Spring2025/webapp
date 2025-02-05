@@ -1,6 +1,6 @@
 #!/bin/bash
 
-
+#variables used in the
 DB_NAME="health_check"
 DB_USERNAME="$DB_USERNAME"
 DB_PASSWORD="$DB_PASSWORD"
@@ -8,6 +8,9 @@ GROUP_NAME="csye6225"
 USER_NAME="student"
 APP_ZIP="PraveenKumar_VijayaKumar_002320648_02.zip"
 
+sudo mkdir -p /opt/csye6225/
+sudo mv /root/${APP_ZIP} /opt/csye6225/
+cd /opt/csye6225/
 
 # Update the list of packages
 echo "Updating package lists"
@@ -24,7 +27,7 @@ sudo apt-get install mysql-server -y
 echo "Database installation done"
 
 
-# Securing Mysql 
+# Securing Mysql
 sudo mysql_secure_installation <<EOF
 
 n  # No root Password
@@ -65,10 +68,6 @@ echo "Updating permissions"
 sudo chown -R ${USER_NAME}:${GROUP_NAME} /opt/csye6225
 sudo chmod -R 750 /opt/csye6225
 
-export SPRING_DATASOURCE_USERNAME=$DB_USERNAME
-export SPRING_DATASOURCE_PASSWORD=$DB_PASSWORD
-
-
 echo "Installing Maven dependency"
 apt install maven -y
 
@@ -87,6 +86,3 @@ cd webapp
 
 echo "Building Started for the Web application"
 mvn clean install
-
-echo "Starting the Web application"
-mvn spring-boot:run
