@@ -17,7 +17,7 @@ public class HealthCheckController {
     @Autowired()
     private HealthCheckRepository repository;
 
-    @RequestMapping(path = "/healthz", method = {RequestMethod.GET})
+    @RequestMapping(path = "/healthz", method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.PATCH, RequestMethod.DELETE, RequestMethod.HEAD, RequestMethod.OPTIONS})
     public ResponseEntity<Void> healthCheck(HttpServletRequest httpServletRequest) {
         if (!"GET".equalsIgnoreCase(httpServletRequest.getMethod())) {
             return createResponse(HttpStatus.METHOD_NOT_ALLOWED);
