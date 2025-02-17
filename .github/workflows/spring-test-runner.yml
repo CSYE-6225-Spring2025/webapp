@@ -12,10 +12,14 @@ jobs:
     steps:
       - name: Checkout the Repository
         uses: actions/checkout@v4
+      - name: Echo a message
+        run: echo "Checkout done"
       - name: Install Java 17
         uses: actions/setup-java@v4
         with:
           java-version: "17"
           distribution: "temurin"
+      - name: Echo a message
+        run: echo "Java installation done"
       - name: Run and Build the application
-        uses: mvn clean install
+        run: mvn clean install
