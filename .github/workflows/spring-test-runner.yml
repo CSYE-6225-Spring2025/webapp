@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: Integration-test tunner
+    name: Integration-test runner
     runs-on: ubuntu-latest
 
     steps:
@@ -24,4 +24,4 @@ jobs:
       - name: Echo a message
         run: echo "Java installation done"
       - name: Run and Build the application
-        run: mvn clean install
+        run: mvn clean test
