@@ -1,5 +1,14 @@
 #!/bin/bash
 
+
+# Update the list of packages
+echo "Updating package lists"
+sudo apt-get update -y
+
+# Upgrade the packages in the system
+echo "Upgrading packages"
+sudo apt-get upgrade -y
+
 #variables used in the
 DB_NAME="health_check"
 DB_USERNAME="$DB_USERNAME"
@@ -11,14 +20,6 @@ APP_ZIP="PraveenKumar_VijayaKumar_002320648_02.zip"
 sudo mkdir -p /opt/csye6225/
 sudo mv /root/${APP_ZIP} /opt/csye6225/
 cd /opt/csye6225/
-
-# Update the list of packages
-echo "Updating package lists"
-sudo apt-get update -y
-
-# Upgrade the packages in the system
-echo "Upgrading packages"
-sudo apt-get upgrade -y
 
 # install Mysql server in server
 echo "Installing MySQL"
