@@ -10,6 +10,10 @@ jobs:
   build:
     name: Integration-test runner
     runs-on: ubuntu-latest
+    env:
+      SPRING_DATASOURCE_USERNAME: ${{ secrets.SPRING_DATASOURCE_USERNAME }}
+      SPRING_DATASOURCE_PASSWORD: ${{ secrets.SPRING_DATASOURCE_PASSWORD }}
+
     services:
       mysql:
         image: mysql:8.0
