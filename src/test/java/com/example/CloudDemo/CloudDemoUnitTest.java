@@ -2,6 +2,7 @@ package com.example.CloudDemo;
 
 import com.example.CloudDemo.Repository.HealthCheckRepository;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -27,8 +28,8 @@ public class CloudDemoUnitTest {
 
     private HealthCheckRepository repository;
 
-    @AfterEach
-    void restoreDatabase() {
+    @BeforeEach
+    void createTable() {
         jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS health_check (" +
                 "check_id BIGINT NOT NULL AUTO_INCREMENT, " +
                 "datetime TIMESTAMP NOT NULL, " +
@@ -67,8 +68,8 @@ public class CloudDemoUnitTest {
     }
 
     @Test
-    @Sql(statements = "DROP TABLE IF EXISTS health_check;")
     void testHealthCheck_Throw503WhenDatabaseActionFails() throws Exception {
+        jdbcTemplate.execute("DROP TABLE IF EXISTS health_check");
         mockMvc.perform(get("/healthz"))
                 .andExpect(status().is5xxServerError());
     }
