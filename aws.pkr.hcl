@@ -24,10 +24,18 @@ variable "group_name" {
   default = "csye6225"
 }
 variable "ssh_username" {
-  type = string
+  type    = string
   default = "ubuntu"
 }
+variable "DB_USERNAME" {
+  type    = string
+  default = "default_db_user"
+}
 
+variable "DB_PASSWORD" {
+  type    = string
+  default = "default_db_password"
+}
 
 packer {
   required_plugins {
@@ -71,14 +79,14 @@ build {
   provisioner "shell" {
     inline = [
       "sudo mkdir -p /etc/myapp",
-      # Write the env file with credentials
-      "echo 'DB_USERNAME=${getenv("DB_USERNAME")}' | sudo tee /etc/myapp/myapp.env",
-      "echo 'DB_PASSWORD=${getenv("DB_PASSWORD")}' | sudo tee -a /etc/myapp/myapp.env",
-      "echo 'SPRING_DATASOURCE_USERNAME=${getenv("SPRING_DATASOURCE_USERNAME")}' | sudo tee -a /etc/myapp/myapp.env",
-      "echo 'SPRING_DATASOURCE_PASSWORD=${getenv("SPRING_DATASOURCE_PASSWORD")}' | sudo tee -a /etc/myapp/myapp.env",
+      "echo 'DB_USERNAME=${var.DB_USERNAME}' | sudo tee /etc/myapp/myapp.env",
+      "echo 'DB_PASSWORD=${var.DB_PASSWORD}' | sudo tee -a /etc/myapp/myapp.env",
+      "echo 'SPRING_DATASOURCE_USERNAME=${var.DB_USERNAME}' | sudo tee -a /etc/myapp/myapp.env",
+      "echo 'SPRING_DATASOURCE_PASSWORD=${var.DB_PASSWORD}' | sudo tee -a /etc/myapp/myapp.env",
       "sudo chmod 600 /etc/myapp/myapp.env"
     ]
   }
+
 
   provisioner "shell" {
     inline = [
@@ -95,8 +103,8 @@ build {
       # 4) Create a dedicated database and user inside MySQL
       #    We pipe commands into "sudo mysql" so they run as root without needing a password
       "echo \"CREATE DATABASE health_check;\" | sudo mysql",
-      "echo \"CREATE USER '${getenv("DB_USERNAME")}'@'localhost' IDENTIFIED BY '${getenv("DB_PASSWORD")}';\" | sudo mysql",
-      "echo \"GRANT ALL PRIVILEGES ON health_check.* TO '${getenv("DB_USERNAME")}'@'localhost';\" | sudo mysql",
+      "echo \"CREATE USER '${var.DB_USERNAME}'@'localhost' IDENTIFIED BY '${var.DB_PASSWORD}';\" | sudo mysql",
+      "echo \"GRANT ALL PRIVILEGES ON health_check.* TO '${var.DB_USERNAME}'@'localhost';\" | sudo mysql",
       "echo \"FLUSH PRIVILEGES;\" | sudo mysql"
     ]
   }
