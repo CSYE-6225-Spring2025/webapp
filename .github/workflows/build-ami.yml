@@ -42,10 +42,6 @@ jobs:
       - name: Build JAR
         run: mvn clean package -DskipTests
 
-      - name: Rename JAR to Expected Name
-        run: |
-          mv target/CloudDemo-*-SNAPSHOT.jar target/app-jar || { echo "JAR rename failed!"; exit 1; }
-
       - name: Upload JAR Artifact
         uses: actions/upload-artifact@v4
         with:
