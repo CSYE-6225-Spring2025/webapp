@@ -70,22 +70,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Validate Packer Template
-        id: packer-validate
-        uses: hashicorp/packer-github-actions@master
-        with:
-          command: validate
-          arguments: |
-            -var "aws_region=${{ secrets.AWS_REGION }}"
-            -var "instance_type=${{ secrets.INSTANCE_TYPE }}"
-            -var "ami_name_prefix=${{ secrets.AMI_NAME_PREFIX }}"
-            -var "user_name=${{ secrets.USER_NAME }}"
-            -var "group_name=${{ secrets.GROUP_NAME }}"
-            -var "ssh_username=${{ secrets.SSH_USERNAME }}"
-            -var "DB_USERNAME=${{ secrets.DB_USERNAME }}"
-            -var "DB_PASSWORD=${{ secrets.DB_PASSWORD }}"
-            ami.pkr.hcl
-
       - name: Run Packer to Build AMI
         id: packer
         uses: hashicorp/packer-github-actions@master
