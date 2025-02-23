@@ -1,0 +1,114 @@
+name: Build and Deploy AMI
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Run integration test
+    runs-on: ubuntu-latest
+    env:
+      SPRING_DATASOURCE_USERNAME: ${{ secrets.SPRING_DATASOURCE_USERNAME }}
+      SPRING_DATASOURCE_PASSWORD: ${{ secrets.SPRING_DATASOURCE_PASSWORD }}
+      DB_USERNAME: ${{ secrets.DB_USERNAME }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_USERNAME : ${{ secrets.DB_USERNAME }}
+          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          MYSQL_DATABASE: health_check
+        ports:
+          - 3306:3306
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Run Tests
+        run: mvn clean test
+
+      - name: Build JAR
+        run: mvn clean package -DskipTests
+
+      - name: Upload JAR Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-jar
+          path: target/*.jar
+
+  build-ami:
+    name: build AMI image
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Download JAR Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: app-jar
+          path: target/
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Validate Packer Template
+        uses: hashicorp/packer-github-actions@master
+        with:
+          command: validate
+          arguments: ami.pkr.hcl
+
+      - name: Run Packer to Build AMI
+        id: packer
+        uses: hashicorp/packer-github-actions@master
+        with:
+          command: build
+          arguments: >
+            -var "aws_region=${{ secrets.AWS_REGION }}"
+            -var "instance_type=${{ secrets.INSTANCE_TYPE }}"
+            -var "ami_name_prefix=${{ secrets.AMI_NAME_PREFIX }}"
+            -var "user_name=${{ secrets.USER_NAME }}"
+            -var "group_name=${{ secrets.GROUP_NAME }}"
+            -var "ssh_username=${{ secrets.SSH_USERNAME }}"
+            ami.pkr.hcl
+        env:
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          SPRING_DATASOURCE_USERNAME: ${{ secrets.SPRING_DATASOURCE_USERNAME }}
+          SPRING_DATASOURCE_PASSWORD: ${{ secrets.SPRING_DATASOURCE_PASSWORD }}
+
+      - name: Extract AMI ID
+        run: |
+          AMI_ID=$(grep -oP 'ami-\w+' packer.log | tail -1 || echo "")
+          if [[ -z "$AMI_ID" ]]; then
+            echo "No AMI ID found!"
+            exit 1
+          fi
+          echo "AMI_ID=$AMI_ID" >> $GITHUB_ENV
+
+      - name: Display AMI ID
+        run:
+          echo "AMI ID: $AMI_ID"
+
+
+
+
+

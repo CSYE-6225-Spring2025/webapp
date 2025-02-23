@@ -39,3 +39,6 @@ Thumbs.db
 mvnw.cmd
 mvnw
 HELP.md
+
+.vscode
+auto.pkrvars.hcl
