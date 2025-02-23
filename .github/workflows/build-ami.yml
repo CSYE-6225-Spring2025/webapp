@@ -95,18 +95,6 @@ jobs:
           SPRING_DATASOURCE_USERNAME: ${{ secrets.SPRING_DATASOURCE_USERNAME }}
           SPRING_DATASOURCE_PASSWORD: ${{ secrets.SPRING_DATASOURCE_PASSWORD }}
 
-      - name: Extract AMI ID
-        run: |
-          AMI_ID=$(grep -oP 'ami-\w+' packer.log | tail -1 || echo "")
-          if [[ -z "$AMI_ID" ]]; then
-            echo "No AMI ID found!"
-            exit 1
-          fi
-          echo "AMI_ID=$AMI_ID" >> $GITHUB_ENV
-
-      - name: Display AMI ID
-        run:
-          echo "AMI ID: $AMI_ID"
 
 
 
