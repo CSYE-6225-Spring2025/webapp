@@ -38,3 +38,18 @@ jobs:
         run: echo "Java installation done"
       - name: Run and Build the application
         run: mvn clean test
+
+      - name: Install HashiCorp Packer
+        uses: hashicorp/setup-packer@v3
+        with:
+          version: latest
+
+      - name: Run Packer fmt check
+        run: packer fmt -check .
+
+      - name: Run Packer init
+        run: packer init .
+
+      - name: Validate Packer template
+        run: packer validate .
+
