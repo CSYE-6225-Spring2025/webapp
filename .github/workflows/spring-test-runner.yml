@@ -44,6 +44,11 @@ jobs:
         with:
           version: latest
 
+      - name: Create Placeholder JAR File
+        run: |
+          mkdir -p target
+          touch target/app-jar
+
       - name: Run Packer fmt check
         run: packer fmt -check .
 
