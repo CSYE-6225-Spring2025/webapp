@@ -70,6 +70,9 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
+      - name: Initialize Packer (Install Plugins)
+        run: packer init aws.pkr.hcl
+
       - name: Create Packer Variable File
         run: |
           cat <<EOF > auto.pkrvars.hcl
