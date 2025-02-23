@@ -71,10 +71,18 @@ jobs:
           aws-region: us-east-1
 
       - name: Validate Packer Template
+        id: packer-validate
         uses: hashicorp/packer-github-actions@master
         with:
           command: validate
-          arguments: ami.pkr.hcl
+          arguments: |
+            -var "aws_region=${{ secrets.AWS_REGION }}"
+            -var "instance_type=${{ secrets.INSTANCE_TYPE }}"
+            -var "ami_name_prefix=${{ secrets.AMI_NAME_PREFIX }}"
+            -var "user_name=${{ secrets.USER_NAME }}"
+            -var "group_name=${{ secrets.GROUP_NAME }}"
+            -var "ssh_username=${{ secrets.SSH_USERNAME }}"
+            ami.pkr.hcl
 
       - name: Run Packer to Build AMI
         id: packer
