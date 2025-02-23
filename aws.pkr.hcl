@@ -111,7 +111,7 @@ build {
 
   # 3) Copy the Spring Boot JAR you built locally
   provisioner "file" {
-    source      = "target/app-jar"
+    source      = "target/CloudDemo-0.0.1-SNAPSHOT.jar"
     destination = "/tmp/myapp.jar"
   }
   provisioner "shell" {
