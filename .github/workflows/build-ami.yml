@@ -82,6 +82,8 @@ jobs:
             -var "user_name=${{ secrets.USER_NAME }}"
             -var "group_name=${{ secrets.GROUP_NAME }}"
             -var "ssh_username=${{ secrets.SSH_USERNAME }}"
+            -var "DB_USERNAME=${{ secrets.DB_USERNAME }}"
+            -var "DB_PASSWORD=${{ secrets.DB_PASSWORD }}"
             ami.pkr.hcl
 
       - name: Run Packer to Build AMI
@@ -96,6 +98,8 @@ jobs:
             -var "user_name=${{ secrets.USER_NAME }}"
             -var "group_name=${{ secrets.GROUP_NAME }}"
             -var "ssh_username=${{ secrets.SSH_USERNAME }}"
+            -var "DB_USERNAME=${{ secrets.DB_USERNAME }}"
+            -var "DB_PASSWORD=${{ secrets.DB_PASSWORD }}"
             ami.pkr.hcl
         env:
           DB_USERNAME: ${{ secrets.DB_USERNAME }}
