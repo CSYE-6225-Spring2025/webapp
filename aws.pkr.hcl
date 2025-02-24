@@ -102,11 +102,11 @@ build {
 
       # 4) Create a dedicated database and user inside MySQL
       #    We pipe commands into "sudo mysql" so they run as root without needing a password
-      "echo \"CREATE DATABASE health_check;\" | sudo mysql",
-      "echo \"DROP USER IF EXISTS '${var.DB_USERNAME}'@'localhost';\" | sudo mysql",
-      "echo \"CREATE USER '${var.DB_USERNAME}'@'localhost' IDENTIFIED BY '${var.DB_PASSWORD}';\" | sudo mysql",
-      "echo \"GRANT ALL PRIVILEGES ON health_check.* TO '${var.DB_USERNAME}'@'localhost';\" | sudo mysql",
-      "echo \"FLUSH PRIVILEGES;\" | sudo mysql"
+      "echo \"CREATE DATABASE health_check;\" | sudo mysql -u root",
+      "echo \"DROP USER IF EXISTS '${var.DB_USERNAME}'@'localhost';\" | sudo mysql -u root",
+      "echo \"CREATE USER '${var.DB_USERNAME}'@'localhost' IDENTIFIED BY '${var.DB_PASSWORD}';\" | sudo mysql -u root",
+      "echo \"GRANT ALL PRIVILEGES ON health_check.* TO '${var.DB_USERNAME}'@'localhost';\" | sudo mysql -u root",
+      "echo \"FLUSH PRIVILEGES;\" | sudo mysql -u root"
     ]
   }
 
