@@ -100,13 +100,17 @@ build {
       "sudo systemctl enable mysql",
       "sudo systemctl start mysql",
 
+      # Set MySQL root password using variable
+      "sudo mysql -e \"ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '${var.DB_PASSWORD}';\"",
+      "sudo systemctl restart mysql",
+
       # 4) Create a dedicated database and user inside MySQL
       #    We pipe commands into "sudo mysql" so they run as root without needing a password
-      "echo \"CREATE DATABASE health_check;\" | sudo mysql -u root",
-      "echo \"DROP USER IF EXISTS '${var.DB_USERNAME}'@'localhost';\" | sudo mysql -u root",
-      "echo \"CREATE USER '${var.DB_USERNAME}'@'localhost' IDENTIFIED BY '${var.DB_PASSWORD}';\" | sudo mysql -u root",
-      "echo \"GRANT ALL PRIVILEGES ON health_check.* TO '${var.DB_USERNAME}'@'localhost';\" | sudo mysql -u root",
-      "echo \"FLUSH PRIVILEGES;\" | sudo mysql -u root"
+      "echo \"CREATE DATABASE health_check;\" | mysql -u root -p'${var.DB_PASSWORD}'",
+      "echo \"DROP USER IF EXISTS '${var.DB_USERNAME}'@'localhost';\" | mysql -u root -p'${var.DB_PASSWORD}'",
+      "echo \"CREATE USER '${var.DB_USERNAME}'@'localhost' IDENTIFIED BY '${var.DB_PASSWORD}';\" | mysql -u root -p'${var.DB_PASSWORD}'",
+      "echo \"GRANT ALL PRIVILEGES ON health_check.* TO '${var.DB_USERNAME}'@'localhost';\" | mysql -u root -p'${var.DB_PASSWORD}'",
+      "echo \"FLUSH PRIVILEGES;\" | mysql -u root -p'${var.DB_PASSWORD}'"
     ]
   }
 
