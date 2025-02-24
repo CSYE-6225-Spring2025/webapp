@@ -82,8 +82,8 @@ jobs:
           user_name = "${{ secrets.USER_NAME }}"
           group_name = "${{ secrets.GROUP_NAME }}"
           ssh_username = "${{ secrets.SSH_USERNAME }}"
-          DB_USERNAME = "${{ secrets.DB_USERNAME }}"
-          DB_PASSWORD = "${{ secrets.DB_PASSWORD }}"
+          PACKER_DB_USERNAME = "${{ secrets.PACKER_DB_USERNAME }}"
+          PACKER_DB_PASSWORD = "${{ secrets.PACKER_DB_PASSWORD }}"
           EOF
 
       - name: Run Packer Build
