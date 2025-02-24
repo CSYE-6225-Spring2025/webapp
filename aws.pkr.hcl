@@ -27,12 +27,12 @@ variable "ssh_username" {
   type    = string
   default = "ubuntu"
 }
-variable "DB_USERNAME" {
+variable "PACKER_DB_USERNAME" {
   type    = string
   default = "default_db_user"
 }
 
-variable "DB_PASSWORD" {
+variable "PACKER_DB_PASSWORD" {
   type    = string
   default = "default_db_password"
 }
@@ -79,10 +79,10 @@ build {
   provisioner "shell" {
     inline = [
       "sudo mkdir -p /etc/myapp",
-      "echo 'DB_USERNAME=${var.DB_USERNAME}' | sudo tee /etc/myapp/myapp.env",
-      "echo 'DB_PASSWORD=${var.DB_PASSWORD}' | sudo tee -a /etc/myapp/myapp.env",
-      "echo 'SPRING_DATASOURCE_USERNAME=${var.DB_USERNAME}' | sudo tee -a /etc/myapp/myapp.env",
-      "echo 'SPRING_DATASOURCE_PASSWORD=${var.DB_PASSWORD}' | sudo tee -a /etc/myapp/myapp.env",
+      "echo 'DB_USERNAME=${var.PACKER_DB_USERNAME}' | sudo tee /etc/myapp/myapp.env",
+      "echo 'DB_PASSWORD=${var.PACKER_DB_PASSWORD}' | sudo tee -a /etc/myapp/myapp.env",
+      "echo 'SPRING_DATASOURCE_USERNAME=${var.PACKER_DB_USERNAME}' | sudo tee -a /etc/myapp/myapp.env",
+      "echo 'SPRING_DATASOURCE_PASSWORD=${var.PACKER_DB_PASSWORD}' | sudo tee -a /etc/myapp/myapp.env",
       "sudo chmod 600 /etc/myapp/myapp.env"
     ]
   }
@@ -101,16 +101,16 @@ build {
       "sudo systemctl start mysql",
 
       # Set MySQL root password using variable
-      "sudo mysql -e \"ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '${var.DB_PASSWORD}';\"",
+      "sudo mysql -e \"ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '${var.PACKER_DB_PASSWORD}';\"",
       "sudo systemctl restart mysql",
 
       # 4) Create a dedicated database and user inside MySQL
       #    We pipe commands into "sudo mysql" so they run as root without needing a password
-      "echo \"CREATE DATABASE health_check;\" | mysql -u root -p'${var.DB_PASSWORD}'",
-      "echo \"DROP USER IF EXISTS '${var.DB_USERNAME}'@'localhost';\" | mysql -u root -p'${var.DB_PASSWORD}'",
-      "echo \"CREATE USER '${var.DB_USERNAME}'@'localhost' IDENTIFIED BY '${var.DB_PASSWORD}';\" | mysql -u root -p'${var.DB_PASSWORD}'",
-      "echo \"GRANT ALL PRIVILEGES ON health_check.* TO '${var.DB_USERNAME}'@'localhost';\" | mysql -u root -p'${var.DB_PASSWORD}'",
-      "echo \"FLUSH PRIVILEGES;\" | mysql -u root -p'${var.DB_PASSWORD}'"
+      "echo \"CREATE DATABASE health_check;\" | mysql -u root -p'${var.PACKER_DB_PASSWORD}'",
+      "echo \"DROP USER IF EXISTS '${var.PACKER_DB_USERNAME}'@'localhost';\" | mysql -u root -p'${var.PACKER_DB_PASSWORD}'",
+      "echo \"CREATE USER '${var.PACKER_DB_USERNAME}'@'localhost' IDENTIFIED BY '${var.PACKER_DB_PASSWORD}';\" | mysql -u root -p'${var.PACKER_DB_PASSWORD}'",
+      "echo \"GRANT ALL PRIVILEGES ON health_check.* TO '${var.PACKER_DB_USERNAME}'@'localhost';\" | mysql -u root -p'${var.PACKER_DB_PASSWORD}'",
+      "echo \"FLUSH PRIVILEGES;\" | mysql -u root -p'${var.PACKER_DB_PASSWORD}'"
     ]
   }
 
