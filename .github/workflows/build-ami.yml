@@ -70,11 +70,9 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Create GCP Key JSON file
-        env:
-          GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
-        run: |
-          echo "${GCP_SERVICE_ACCOUNT_KEY}" | base64 --decode > gcp-key.json
+      - name: Save GCP Service Account Key
+        run: echo "$GCP_SERVICE_ACCOUNT_KEY" > gcp-key.json
+        shell: bash
 
       - name: Authenticate with GCP
         run: |
