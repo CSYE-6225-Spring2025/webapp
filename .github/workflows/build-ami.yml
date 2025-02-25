@@ -70,13 +70,10 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Create GCP Auth JSON File
-        run: |
-          echo '${{ secrets.GCP_SERVICE_ACCOUNT }}' > gcp-key.json
-        shell: bash
-
-      - name: Authenticate with GCP using JSON File
-        run: gcloud auth activate-service-account --key-file=gcp-key.json
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}"
 
       - name: Initialize Packer (Install Plugins)
         run: packer init aws.pkr.hcl
