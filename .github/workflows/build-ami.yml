@@ -75,6 +75,10 @@ jobs:
         with:
           credentials_json: "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}"
 
+      - name: Create JSON File from Secret
+        run: |
+          echo '${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}' | jq '.' > secret.json
+
       - name: Initialize Packer (Install Plugins)
         run: packer init aws.pkr.hcl
 
@@ -91,7 +95,7 @@ jobs:
           PACKER_DB_PASSWORD = "${{ secrets.PACKER_DB_PASSWORD }}"
           gcp_project_id = "${{ secrets.GCP_PROJECT_ID }}"
           gcp_zone = "${{ secrets.GCP_ZONE }}"
-          credentials_file  = "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}"
+          credentials_file  = "secret.json"
           EOF
 
       - name: Run Packer Build
