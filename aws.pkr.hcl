@@ -63,7 +63,7 @@ packer {
 }
 
 source "amazon-ebs" "ubuntu" {
-  ami_name      = "learn-packer-linux-aws-${timestamp()}"
+  ami_name      = "learn-packer-linux-aws1-${formatdate("YYYYMMDDHHmmss", timestamp())}"
   source_ami    = "ami-04b4f1a9cf54c11d0"
   instance_type = var.instance_type
   region        = var.aws_region
@@ -85,7 +85,7 @@ source "googlecompute" "ubuntu" {
   image_project_id        = var.gcp_project_id
   image_description       = "Custom Ubuntu 20.04 server image"
   image_storage_locations = ["us"]
-  image_name              = "learn-packer-linux-gcp-${timestamp()}"
+  image_name              = "learn-packer-linux-gcp1-${formatdate("YYYYMMDDHHmmss", timestamp())}"
   image_family            = "my-custom-ami"
   ssh_username            = var.ssh_username
 }
