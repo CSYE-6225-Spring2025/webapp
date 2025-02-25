@@ -72,22 +72,22 @@ source "amazon-ebs" "ubuntu" {
 }
 
 source "googlecompute" "ubuntu" {
-  project_id        = var.gcp_project_id
-  source_image      = "ubuntu-2404-noble-amd64-v20250214"
-  source_image_family = "ubuntu-2404-noble-amd64"
-  credentials_file  = var.credentials_file
-  zone              = var.gcp_zone
-  machine_type      = "n1-standard-1"
-  disk_size         = 10
-  disk_type         = "pd-standard"
-  network           = "default"
-  tags              = ["csye6225"]
-  image_project_id  = var.gcp_project_id
-  image_description = "Custom Ubuntu 20.04 server image"
+  project_id              = var.gcp_project_id
+  source_image            = "ubuntu-2404-noble-amd64-v20250214"
+  source_image_family     = "ubuntu-2404-noble-amd64"
+  credentials_file        = var.credentials_file
+  zone                    = var.gcp_zone
+  machine_type            = "n1-standard-1"
+  disk_size               = 10
+  disk_type               = "pd-standard"
+  network                 = "default"
+  tags                    = ["csye6225"]
+  image_project_id        = var.gcp_project_id
+  image_description       = "Custom Ubuntu 20.04 server image"
   image_storage_locations = ["us"]
-  image_name        = "learn-packer-linux-gcp"
-  image_family      = "my-custom-ami"
-  ssh_username      = var.ssh_username
+  image_name              = "learn-packer-linux-gcp"
+  image_family            = "my-custom-ami"
+  ssh_username            = var.ssh_username
 }
 
 build {
