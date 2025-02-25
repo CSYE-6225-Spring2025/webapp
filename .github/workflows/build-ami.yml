@@ -91,7 +91,7 @@ jobs:
           PACKER_DB_PASSWORD = "${{ secrets.PACKER_DB_PASSWORD }}"
           gcp_project_id = "${{ secrets.GCP_PROJECT_ID }}"
           gcp_zone = "${{ secrets.GCP_ZONE }}"
-          credentials_file  = "gcp-key.json"
+          credentials_file  = "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}"
           EOF
 
       - name: Run Packer Build
