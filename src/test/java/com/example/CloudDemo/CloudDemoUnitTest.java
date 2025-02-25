@@ -40,7 +40,7 @@ public class CloudDemoUnitTest {
     @Test
     void testHealthCheck_Successful() throws Exception {
         mockMvc.perform(get("/healthz"))
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isOk());
     }
 
     @Test
