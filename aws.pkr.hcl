@@ -37,11 +37,27 @@ variable "PACKER_DB_PASSWORD" {
   default = "default_db_password"
 }
 
+variable "gcp_project_id" {
+  default = "development-452002"
+}
+
+variable "gcp_zone" {
+  default = "us-east1-d"
+}
+
+variable "credentials_file" {
+  default = "development-creds.json"
+}
+
 packer {
   required_plugins {
     amazon = {
       version = ">=1.2.8"
       source  = "github.com/hashicorp/amazon"
+    }
+    googlecompute = {
+      version = ">=0.2.0"
+      source  = "github.com/hashicorp/googlecompute"
     }
   }
 }
@@ -55,10 +71,30 @@ source "amazon-ebs" "ubuntu" {
   ami_users     = var.accounts
 }
 
+source "googlecompute" "ubuntu" {
+  project_id              = var.gcp_project_id
+  source_image            = "ubuntu-2404-noble-amd64-v20250214"
+  source_image_family     = "ubuntu-2404-noble-amd64"
+  credentials_file        = var.credentials_file
+  zone                    = var.gcp_zone
+  machine_type            = "n1-standard-1"
+  disk_size               = 10
+  disk_type               = "pd-standard"
+  network                 = "default"
+  tags                    = ["csye6225"]
+  image_project_id        = var.gcp_project_id
+  image_description       = "Custom Ubuntu 20.04 server image"
+  image_storage_locations = ["us"]
+  image_name              = "learn-packer-linux-gcp"
+  image_family            = "my-custom-ami"
+  ssh_username            = var.ssh_username
+}
+
 build {
   name = "learn-packer"
   sources = [
-    "source.amazon-ebs.ubuntu"
+    "source.amazon-ebs.ubuntu",
+    "source.googlecompute.ubuntu"
   ]
   # 1) Create csye6225 user
   provisioner "shell" {

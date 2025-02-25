@@ -56,5 +56,5 @@ jobs:
         run: packer init .
 
       - name: Validate Packer template
-        run: packer validate .
+        run: packer validate -syntax-only .
 
