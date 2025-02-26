@@ -87,7 +87,7 @@ jobs:
           cat <<EOF > auto.pkrvars.hcl
           aws_region    = "${{ secrets.AWS_REGION }}"
           instance_type = "${{ secrets.INSTANCE_TYPE }}"
-          accounts      = "${{ secrets.AWS_ACCOUNTS }}"
+          accounts      =  ${{ secrets.AWS_ACCOUNTS }}
           ami_name_prefix = "${{ secrets.AMI_NAME_PREFIX }}"
           user_name     = "${{ secrets.USER_NAME }}"
           group_name    = "${{ secrets.GROUP_NAME }}"
