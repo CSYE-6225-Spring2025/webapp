@@ -49,12 +49,15 @@ jobs:
           mkdir -p target
           touch target/CloudDemo-0.0.1-SNAPSHOT.jar
 
-      - name: Run Packer fmt check
-        run: packer fmt -check .
-
       - name: Run Packer init
         run: packer init .
 
+      - name: Create Empty JSON File
+        run: touch development-creds.json
+
+      - name: Run Packer fmt check
+        run: packer fmt -check .
+
       - name: Validate Packer template
-        run: packer validate -syntax-only .
+        run: packer validate .
 
