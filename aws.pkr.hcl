@@ -96,7 +96,7 @@ build {
     "source.amazon-ebs.ubuntu",
     "source.googlecompute.ubuntu"
   ]
-  # 1) Create csye6225 user
+
   provisioner "shell" {
     inline = [
       "sudo groupadd -f ${var.group_name}",
@@ -104,7 +104,7 @@ build {
     ]
   }
 
-  # 2) Install dependencies
+
   provisioner "shell" {
     inline = [
       "sudo apt-get update -y || sudo update -y",
@@ -126,22 +126,15 @@ build {
 
   provisioner "shell" {
     inline = [
-      # 1) Update the package list
+
       "sudo apt-get update -y",
-
-      # 2) Install MySQL server (not just the client)
       "sudo apt-get install -y mysql-server",
-
-      # 3) Make sure MySQL is started and enabled on boot
       "sudo systemctl enable mysql",
       "sudo systemctl start mysql",
 
-      # Set MySQL root password using variable
+
       "sudo mysql -e \"ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '${var.PACKER_DB_PASSWORD}';\"",
       "sudo systemctl restart mysql",
-
-      # 4) Create a dedicated database and user inside MySQL
-      #    We pipe commands into "sudo mysql" so they run as root without needing a password
       "echo \"CREATE DATABASE health_check;\" | mysql -u root -p'${var.PACKER_DB_PASSWORD}'",
       "echo \"DROP USER IF EXISTS '${var.PACKER_DB_USERNAME}'@'localhost';\" | mysql -u root -p'${var.PACKER_DB_PASSWORD}'",
       "echo \"CREATE USER '${var.PACKER_DB_USERNAME}'@'localhost' IDENTIFIED BY '${var.PACKER_DB_PASSWORD}';\" | mysql -u root -p'${var.PACKER_DB_PASSWORD}'",
@@ -150,7 +143,7 @@ build {
     ]
   }
 
-  # 3) Copy the Spring Boot JAR you built locally
+
   provisioner "file" {
     source      = "target/CloudDemo-0.0.1-SNAPSHOT.jar"
     destination = "/tmp/myapp.jar"
@@ -162,17 +155,12 @@ build {
       "sudo chown -R ${var.user_name}:${var.group_name} /opt/myapp"
     ]
   }
-  # 4) Copy a file with environment variables
 
-
-  # 5) Move env file into place, set permissions
-  # 6) Copy systemd service file
   provisioner "file" {
     source      = "myapp.service"
     destination = "/tmp/myapp.service"
   }
 
-  # 7) Enable the service
   provisioner "shell" {
     inline = [
       "sudo mv /tmp/myapp.service /etc/systemd/system/myapp.service",
