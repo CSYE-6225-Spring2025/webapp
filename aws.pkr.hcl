@@ -71,7 +71,7 @@ packer {
 source "amazon-ebs" "ubuntu" {
   ami_name      = "packer-aws-${formatdate("YYYYMMDDHHmmss", timestamp())}"
   source_ami    = "ami-04b4f1a9cf54c11d0"
-  instance_type     = var.instance_type
+  instance_type = var.instance_type
   region        = var.aws_region
   ssh_username  = var.ssh_username
   ami_users     = var.accounts
