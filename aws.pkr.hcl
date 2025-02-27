@@ -55,25 +55,25 @@ variable "gcp_image_name" {
   default = "packer-gcp"
 }
 
-variable gcp_source_image{
+variable gcp_source_image {
   default = "ubuntu-2404-noble-amd64-v20250214"
 }
-variable gcp_source_image_family{
+variable gcp_source_image_family {
   default = "ubuntu-2404-noble-amd64"
 }
 
-variable gcp_machine_type{
+variable gcp_machine_type {
   default = "n1-standard-1"
 }
-variable gcp_disk_type{
+variable gcp_disk_type {
   default = "pd-standard"
 }
-variable gcp_network{
-  default="default"
+variable gcp_network {
+  default = "default"
 }
 
-variable gcp_image_description{
-  default="Custom Ubuntu 20.04 server image"
+variable gcp_image_description {
+  default = "Custom Ubuntu 20.04 server image"
 }
 
 packer {
