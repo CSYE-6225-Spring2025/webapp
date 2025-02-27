@@ -48,6 +48,9 @@ variable "gcp_zone" {
 variable "credentials_file" {
   default = "development-creds.json"
 }
+variable "gcp_demo_account" {
+  default = "charged-state-452206-s2"
+}
 
 packer {
   required_plugins {
@@ -167,6 +170,12 @@ build {
       "sudo chown root:root /etc/systemd/system/myapp.service",
       "sudo systemctl daemon-reload",
       "sudo systemctl enable myapp.service"
+    ]
+  }
+
+  post-processor "shell-local" {
+    inline = [
+      "gcloud compute images add-iam-policy-binding learn-packer-linux-gcp1-${formatdate("YYYYMMDDHHmmss", timestamp())} --project=${var.gcp_project_id} --member='project:${var.gcp_demo_account}' --role='roles/compute.imageUser'"
     ]
   }
 }
