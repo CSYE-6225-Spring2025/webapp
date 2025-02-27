@@ -55,6 +55,27 @@ variable "gcp_image_name" {
   default = "packer-gcp"
 }
 
+variable gcp_source_image{
+  default = "ubuntu-2404-noble-amd64-v20250214"
+}
+variable gcp_source_image_family{
+  default = "ubuntu-2404-noble-amd64"
+}
+
+variable gcp_machine_type{
+  default = "n1-standard-1"
+}
+variable gcp_disk_type{
+  default = "pd-standard"
+}
+variable gcp_network{
+  default="default"
+}
+
+variable gcp_image_description{
+  default="Custom Ubuntu 20.04 server image"
+}
+
 packer {
   required_plugins {
     amazon = {
@@ -79,17 +100,17 @@ source "amazon-ebs" "ubuntu" {
 
 source "googlecompute" "ubuntu" {
   project_id              = var.gcp_project_id
-  source_image            = "ubuntu-2404-noble-amd64-v20250214"
-  source_image_family     = "ubuntu-2404-noble-amd64"
+  source_image            = var.gcp_source_image
+  source_image_family     = var.gcp_source_image_family
   credentials_file        = var.credentials_file
   zone                    = var.gcp_zone
-  machine_type            = "n1-standard-1"
+  machine_type            = var.gcp_machine_type
   disk_size               = 10
-  disk_type               = "pd-standard"
-  network                 = "default"
+  disk_type               = var.gcp_disk_type
+  network                 = var.gcp_network
   tags                    = ["csye6225"]
   image_project_id        = var.gcp_project_id
-  image_description       = "Custom Ubuntu 20.04 server image"
+  image_description       = var.gcp_image_description
   image_storage_locations = ["us"]
   image_name              = "packer-gcp-${formatdate("YYYYMMDDHHmmss", timestamp())}"
   image_family            = "my-custom-ami"
@@ -97,7 +118,7 @@ source "googlecompute" "ubuntu" {
 }
 
 build {
-  name = "learn-packer"
+  name = "packer"
   sources = [
     "source.amazon-ebs.ubuntu",
     "source.googlecompute.ubuntu"

@@ -87,6 +87,12 @@ jobs:
           cat <<EOF > auto.pkrvars.hcl
           aws_region    = "${{ secrets.AWS_REGION }}"
           gcp_demo_account = "${{ secrets.GCP_DEMO_ACCOUNT }}"
+          gcp_source_image = "${{ secrets.GCP_SOURCE_IMAGE }}"
+          gcp_source_image_family = "${{ secrets.GCP_SOURCE_IMAGE_FAMILY }}"
+          gcp_machine_type = "${{ secrets.GCP_IMAGE_NAME }}"
+          gcp_disk_type = "${{ secrets.GCP_DISK_TYPE }}"
+          gcp_network = "${{ secrets.GCP_NETWORK }}"
+          gcp_image_description = "${{ secrets.GCP_IMAGE_DESCRIPTION }}"
           gcp_image_name = "${{ secrets.GCP_IMAGE_NAME }}"
           instance_type = "${{ secrets.INSTANCE_TYPE }}"
           accounts      =  ${{ secrets.AWS_ACCOUNTS }}
