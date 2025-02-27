@@ -51,6 +51,9 @@ variable "credentials_file" {
 variable "gcp_demo_account" {
   default = "charged-state-452206-s2"
 }
+variable "gcp_image_name" {
+  default = "packer-gcp-${formatdate("YYYYMMDDHHmmss", timestamp())}"
+}
 
 packer {
   required_plugins {
@@ -66,7 +69,7 @@ packer {
 }
 
 source "amazon-ebs" "ubuntu" {
-  ami_name      = "learn-packer-linux-aws1-${formatdate("YYYYMMDDHHmmss", timestamp())}"
+  ami_name      = "packer-aws-${formatdate("YYYYMMDDHHmmss", timestamp())}"
   source_ami    = "ami-04b4f1a9cf54c11d0"
   instance_type = var.instance_type
   region        = var.aws_region
@@ -88,7 +91,7 @@ source "googlecompute" "ubuntu" {
   image_project_id        = var.gcp_project_id
   image_description       = "Custom Ubuntu 20.04 server image"
   image_storage_locations = ["us"]
-  image_name              = "learn-packer-linux-gcp1-${formatdate("YYYYMMDDHHmmss", timestamp())}"
+  image_name              = var.gcp_image_name
   image_family            = "my-custom-ami"
   ssh_username            = var.ssh_username
 }
@@ -175,7 +178,7 @@ build {
 
   post-processor "shell-local" {
     inline = [
-      "gcloud compute images add-iam-policy-binding learn-packer-linux-gcp1-${formatdate("YYYYMMDDHHmmss", timestamp())} --project=${var.gcp_project_id} --member='project:${var.gcp_demo_account}' --role='roles/compute.imageUser'"
+      "gcloud compute images add-iam-policy-binding ${var.gcp_project_id} --project=${var.var.gcp_image_name} --member='project:${var.gcp_demo_account}' --role='roles/compute.imageUser'"
     ]
   }
 }
