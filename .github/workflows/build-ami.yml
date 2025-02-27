@@ -89,7 +89,7 @@ jobs:
           gcp_demo_account = "${{ secrets.GCP_DEMO_ACCOUNT }}"
           gcp_source_image = "${{ secrets.GCP_SOURCE_IMAGE }}"
           gcp_source_image_family = "${{ secrets.GCP_SOURCE_IMAGE_FAMILY }}"
-          gcp_machine_type = "${{ secrets.GCP_IMAGE_NAME }}"
+          gcp_machine_type = "${{ secrets.GCP_MACHINE_TYPE }}"
           gcp_disk_type = "${{ secrets.GCP_DISK_TYPE }}"
           gcp_network = "${{ secrets.GCP_NETWORK }}"
           gcp_image_description = "${{ secrets.GCP_IMAGE_DESCRIPTION }}"
