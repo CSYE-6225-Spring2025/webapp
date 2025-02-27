@@ -178,7 +178,7 @@ build {
 
   post-processor "shell-local" {
     inline = [
-      "gcloud compute images add-iam-policy-binding ${var.gcp_project_id} --project=${var.var.gcp_image_name} --member='project:${var.gcp_demo_account}' --role='roles/compute.imageUser'"
+      "gcloud compute images add-iam-policy-binding ${var.gcp_image_name} --project=${var.gcp_project_id} --member='project:${var.gcp_demo_account}' --role='roles/compute.imageUser'"
     ]
   }
 }
