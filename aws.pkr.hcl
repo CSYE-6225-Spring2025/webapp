@@ -52,7 +52,7 @@ variable "gcp_demo_account" {
   default = "charged-state-452206-s2"
 }
 variable "gcp_image_name" {
-  default = "packer-gcp-1"
+  default = "packer-gcp"
 }
 
 packer {
