@@ -91,7 +91,7 @@ source "googlecompute" "ubuntu" {
   image_project_id        = var.gcp_project_id
   image_description       = "Custom Ubuntu 20.04 server image"
   image_storage_locations = ["us"]
-  image_name              = var.gcp_image_name
+  image_name              = "packer-gcp-${formatdate("YYYYMMDDHHmmss", timestamp())}"
   image_family            = "my-custom-ami"
   ssh_username            = var.ssh_username
 }
@@ -176,15 +176,4 @@ build {
     ]
   }
 
-  post-processor "googlecompute-import" {
-    keep_input_artifact = true
-    project_id          = var.source_project_id
-    image_name          = var.image_name
-    image_iam_permissions = [
-      {
-        role   = "roles/compute.imageUser"
-        member = "serviceAccount:${var.gcp_demo_account}"
-      }
-    ]
-  }
 }
