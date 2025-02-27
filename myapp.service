@@ -4,8 +4,8 @@ After=network.target
 
 [Service]
 Type=simple
-User=6225_USER
-Group=6225_GROUP
+User=csye6225
+Group=csye6225
 EnvironmentFile=/etc/myapp/myapp.env
 ExecStart=/usr/bin/java -jar /opt/myapp/myapp.jar
 Restart=on-failure
