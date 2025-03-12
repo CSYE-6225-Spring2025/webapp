@@ -13,3 +13,4 @@ The Repository contains a health check Api which is used to check the running st
     4.2 SPRING_DATASOURCE_PASSWORD = {password for the Database}
 5. Now click Apply and then ok.
 6. Click run application button to run the application.
+
