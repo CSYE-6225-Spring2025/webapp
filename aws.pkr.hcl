@@ -139,38 +139,6 @@ build {
     ]
   }
 
-  provisioner "shell" {
-    inline = [
-      "sudo mkdir -p /etc/myapp",
-      "echo 'DB_USERNAME=${var.PACKER_DB_USERNAME}' | sudo tee /etc/myapp/myapp.env",
-      "echo 'DB_PASSWORD=${var.PACKER_DB_PASSWORD}' | sudo tee -a /etc/myapp/myapp.env",
-      "echo 'SPRING_DATASOURCE_USERNAME=${var.PACKER_DB_USERNAME}' | sudo tee -a /etc/myapp/myapp.env",
-      "echo 'SPRING_DATASOURCE_PASSWORD=${var.PACKER_DB_PASSWORD}' | sudo tee -a /etc/myapp/myapp.env",
-      "sudo chmod 600 /etc/myapp/myapp.env"
-    ]
-  }
-
-
-  provisioner "shell" {
-    inline = [
-
-      "sudo apt-get update -y",
-      "sudo apt-get install -y mysql-server",
-      "sudo systemctl enable mysql",
-      "sudo systemctl start mysql",
-
-
-      "sudo mysql -e \"ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '${var.PACKER_DB_PASSWORD}';\"",
-      "sudo systemctl restart mysql",
-      "echo \"CREATE DATABASE health_check;\" | mysql -u root -p'${var.PACKER_DB_PASSWORD}'",
-      "echo \"DROP USER IF EXISTS '${var.PACKER_DB_USERNAME}'@'localhost';\" | mysql -u root -p'${var.PACKER_DB_PASSWORD}'",
-      "echo \"CREATE USER '${var.PACKER_DB_USERNAME}'@'localhost' IDENTIFIED BY '${var.PACKER_DB_PASSWORD}';\" | mysql -u root -p'${var.PACKER_DB_PASSWORD}'",
-      "echo \"GRANT ALL PRIVILEGES ON health_check.* TO '${var.PACKER_DB_USERNAME}'@'localhost';\" | mysql -u root -p'${var.PACKER_DB_PASSWORD}'",
-      "echo \"FLUSH PRIVILEGES;\" | mysql -u root -p'${var.PACKER_DB_PASSWORD}'"
-    ]
-  }
-
-
   provisioner "file" {
     source      = "target/CloudDemo-0.0.1-SNAPSHOT.jar"
     destination = "/tmp/myapp.jar"
