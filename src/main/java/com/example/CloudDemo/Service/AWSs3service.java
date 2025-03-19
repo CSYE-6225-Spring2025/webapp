@@ -63,8 +63,6 @@ public class AWSs3service {
                 LocalDateTime.now()
         );
         s3FileMetadataRepository.save(metadata);
-
-
         return new UploadResponse(fileName, fileId, bucketName + "/" + fileId + "/" + fileName, LocalDate.now().toString());
     }
 
@@ -99,7 +97,6 @@ public class AWSs3service {
                     .build();
             s3Client.deleteObject(deleteRequest);
             s3FileMetadataRepository.deleteByFileID(fileId);
-
         } catch (S3Exception e) {
             throw new RuntimeException("File not found for ID: " + fileId);
         }
