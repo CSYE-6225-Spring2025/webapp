@@ -21,6 +21,8 @@ import java.net.URL;
 import java.time.Duration;
 import java.util.List;
 
+import static org.springframework.http.ResponseEntity.status;
+
 @RestController
 public class HealthCheckController {
 
@@ -49,7 +51,7 @@ public class HealthCheckController {
     }
 
     private ResponseEntity<Void> createResponse(HttpStatus status) {
-        return ResponseEntity.status(status)
+        return status(status)
                 .header("Cache-Control", "no-cache, no-store, must-revalidate")
                 .header("X-Content-Type-Options", "nosniff")
                 .header("Pragma", "no-cache")
@@ -58,9 +60,24 @@ public class HealthCheckController {
 
 
     @RequestMapping(method = RequestMethod.POST, path = "/v1/file")
-    public ResponseEntity<UploadResponse> uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
-        UploadResponse response = awSs3service.uploadFile(file);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
+        if (file == null || file.isEmpty()) {
+            return (ResponseEntity<?>)status(HttpStatus.BAD_REQUEST).body("");
+        }
+        try {
+            UploadResponse response = awSs3service.uploadFile(file);
+            return status(201).body(response);
+        } catch (RuntimeException e) {
+            return (ResponseEntity<?>)status(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @RequestMapping(method = {RequestMethod.GET, RequestMethod.DELETE, RequestMethod.HEAD,
+            RequestMethod.OPTIONS, RequestMethod.PATCH, RequestMethod.PUT},
+            path = "/v1/file")
+    public ResponseEntity<String> returnError() {
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
+                .body("");
     }
 
     @RequestMapping(method = RequestMethod.GET, path = "/v1/file/{id}")
@@ -74,13 +91,20 @@ public class HealthCheckController {
     }
 
     @RequestMapping(method = RequestMethod.DELETE, path = "/v1/file/{id}")
-    public ResponseEntity<String> deleteFileById(@PathVariable String id) {
+    public ResponseEntity<Void> deleteFileById(@PathVariable String id) {
         try {
             awSs3service.deleteFileById(id);
-            return ResponseEntity.ok("File deleted successfully: " + id);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
+    }
+
+    @RequestMapping(method = {RequestMethod.HEAD,
+            RequestMethod.OPTIONS, RequestMethod.PATCH, RequestMethod.PUT}, path = "/v1/file/{id}")
+    public ResponseEntity<String> returnErrorForFile() {
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
+                .body("");
     }
 
 
