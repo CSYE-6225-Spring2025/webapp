@@ -53,15 +53,15 @@ public class HealthCheckController {
 
 
     @RequestMapping(method = RequestMethod.POST, path = "/v1/file")
-    public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
+    public ResponseEntity<?> uploadFile(@RequestParam(value = "file", required = false) MultipartFile file) throws IOException {
         if (file == null || file.isEmpty()) {
-            return (ResponseEntity<?>)status(HttpStatus.BAD_REQUEST).body("");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("");
         }
         try {
             UploadResponse response = awSs3service.uploadFile(file);
-            return status(201).body(response);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (RuntimeException e) {
-            return (ResponseEntity<?>)status(HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("");
         }
     }
 
