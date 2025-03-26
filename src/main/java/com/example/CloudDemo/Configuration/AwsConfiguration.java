@@ -12,11 +12,6 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
 @Configuration
 public class AwsConfiguration {
-    @Value("${aws.access.key}")
-    String awsAccessKey;
-
-    @Value("${aws.secret.key}")
-    String awsSecretKey;
 
     @Value("${cloud.aws.region.static}")
     String region;
@@ -25,9 +20,6 @@ public class AwsConfiguration {
     public S3Client s3Client() {
         return S3Client.builder()
                 .region(Region.of(region))
-                .credentialsProvider(StaticCredentialsProvider.create(
-                        AwsBasicCredentials.create(awsAccessKey, awsSecretKey)
-                ))
                 .build();
     }
 

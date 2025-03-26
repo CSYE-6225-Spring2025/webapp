@@ -26,6 +26,7 @@ public class CloudDemoUnitTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+
     private HealthCheckRepository repository;
 
     @BeforeEach

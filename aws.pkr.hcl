@@ -147,9 +147,31 @@ build {
     inline = [
       "sudo mkdir -p /opt/myapp",
       "sudo mv /tmp/myapp.jar /opt/myapp/myapp.jar",
-      "sudo chown -R ${var.user_name}:${var.group_name} /opt/myapp"
+      "sudo chown -R ${var.user_name}:${var.group_name} /opt/myapp",
+      "sudo mkdir -p /var/log/app",
+      "sudo touch /var/log/app/application.log",
+      "sudo chown -R ${var.user_name}:${var.group_name} /var/log/app"
     ]
   }
+  provisioner "shell" {
+    inline = [
+      "wget https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb",
+      "sudo dpkg -i -E ./amazon-cloudwatch-agent.deb"
+    ]
+  }
+  provisioner "file" {
+    source      = "amazon-cloudwatch-agent.json"
+    destination = "/tmp/amazon-cloudwatch-agent.json"
+  }
+
+  provisioner "shell" {
+    inline = [
+      "sudo mkdir -p /opt/aws/amazon-cloudwatch-agent/etc",
+      "sudo mv /tmp/amazon-cloudwatch-agent.json /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json"
+    ]
+  }
+
+
 
   provisioner "file" {
     source      = "myapp.service"
