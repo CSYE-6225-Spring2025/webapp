@@ -39,9 +39,11 @@ public class HealthCheckController {
     @RequestMapping(path = "/healthz", method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.PATCH, RequestMethod.DELETE, RequestMethod.HEAD, RequestMethod.OPTIONS})
     public ResponseEntity<Void> healthCheck(HttpServletRequest httpServletRequest) {
         if (!"GET".equalsIgnoreCase(httpServletRequest.getMethod())) {
+            logger.info("Received BAD REQUEST for /healthz");
             return createResponse(HttpStatus.METHOD_NOT_ALLOWED);
         }
         if (httpServletRequest.getContentLength() > 0 || !httpServletRequest.getParameterMap().isEmpty()) {
+            logger.info("Received BAD REQUEST for /healthz");
             return createResponse(HttpStatus.BAD_REQUEST);
         }
         Timer.Sample dbSample = Timer.start(meterRegistry);
@@ -72,6 +74,7 @@ public class HealthCheckController {
     public ResponseEntity<?> uploadFile(@RequestParam(value = "file", required = false) MultipartFile file) throws IOException {
         logger.info("Received POST request to /v1/file");
         if (file == null || file.isEmpty()) {
+            logger.info("Received BAD REQUEST for /v1/file");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("");
         }
         meterRegistry.counter("api.calls", "endpoint", "/v1/file", "method", "POST").increment();
@@ -121,7 +124,7 @@ public class HealthCheckController {
         Timer.Sample apiSample = Timer.start(meterRegistry);
         try {
             awSs3service.deleteFileById(id);
-            logger.info("Successfully DELETED file: ");
+            logger.info("Successfully DELETED file ");
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } catch (RuntimeException e) {
             logger.error("Exception in deleteFileById", e);
