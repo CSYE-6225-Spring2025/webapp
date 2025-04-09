@@ -114,9 +114,6 @@ jobs:
           
           EOF
 
-      - name: Run Packer Build
-        run: packer build -var-file=auto.pkrvars.hcl aws.pkr.hcl
-
       - name: Extract AMI ID from Packer Output
         id: get-ami-id
         run: |
