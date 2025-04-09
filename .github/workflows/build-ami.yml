@@ -124,13 +124,17 @@ jobs:
         run: |
           aws configure set aws_access_key_id "${{ secrets.DEMO_AWS_ACCESS_KEY_ID }}"
           aws configure set aws_secret_access_key "${{ secrets.DEMO_AWS_SECRET_ACCESS_KEY }}"
-          aws configure set region "${{ secrets.AWS_REGION }}"  
+          aws configure set region "${{ secrets.AWS_REGION }}" 
+
+      - name: Debug Launch Template Name
+        run:
+            echo "LT name: ${{ secrets.LAUNCH_TEMPLATE_NAME }}"
 
       - name: Create New Launch Template Version
         id: lt-version
         run: |
           VERSION=$(aws ec2 create-launch-template-version \
-            --launch-template-name "${{ secrets.LAUNCH_TEMPLATE_NAME }}" \
+            --launch-template-name "webapp-lt-aws-v120250409225953994200000006" \
             --source-version "\$Latest" \
             --version-description "From GitHub Actions - ${{ github.sha }}" \
             --launch-template-data "{\"ImageId\":\"${{ steps.get-ami-id.outputs.AMI_ID }}\"}" \
