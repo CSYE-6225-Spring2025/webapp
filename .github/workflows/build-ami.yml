@@ -127,8 +127,8 @@ jobs:
           aws configure set region "${{ secrets.AWS_REGION }}" 
 
       - name: Debug Launch Template Name
-        run:
-            echo "LT name: ${{ secrets.LAUNCH_TEMPLATE_NAME }}"
+        run: |
+          echo "LT name: ${{ secrets.LAUNCH_TEMPLATE_NAME }}"
 
       - name: Create New Launch Template Version
         id: lt-version
@@ -146,7 +146,7 @@ jobs:
         run: |
           aws autoscaling update-auto-scaling-group \
             --auto-scaling-group-name "${{ secrets.ASG_NAME }}" \
-            --launch-template "LaunchTemplateName=${{ secrets.LAUNCH_TEMPLATE_NAME }},Version=${{ steps.lt-version.outputs.VERSION }}"
+            --launch-template "LaunchTemplateName=webapp-lt-aws-v120250409225953994200000006,Version=${{ steps.lt-version.outputs.VERSION }}"
 
       - name: Start Instance Refresh
         id: refresh
