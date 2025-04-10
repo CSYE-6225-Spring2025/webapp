@@ -114,11 +114,28 @@ jobs:
           
           EOF
 
-      - name: Extract AMI ID from Packer Output
-        id: get-ami-id
+      - name: Build AMI with Packer
         run: |
-          AMI_ID=$(packer build -machine-readable -var-file=auto.pkrvars.hcl aws.pkr.hcl | tee packer-output.log | grep 'artifact,0,id' | cut -d, -f6 | cut -d: -f2)
-          echo "AMI_ID=$AMI_ID" >> $GITHUB_OUTPUT
+          packer build -machine-readable -var-file=auto.pkrvars.hcl aws.pkr.hcl | tee packer-output.log
+
+      - name: Extract AMI ID from Packer Output
+        id: extract_ami
+        run: |
+          # Extracts the latest AMI ID from Packer output using regex
+          AMI_ID=$(grep -oP 'ami-[a-f0-9]+' packer-output.log | tail -1)
+
+          # Check if AMI_ID was found
+          if [ -z "$AMI_ID" ]; then
+            echo "❌ Error: AMI_ID is empty. Check packer_output.log." >&2
+            exit 1
+          fi
+
+          # Log the extracted AMI ID
+          echo "✅ Extracted AMI_ID: $AMI_ID"
+
+          # Set AMI ID as a GitHub Actions output
+          echo "ami_id=$AMI_ID" >> $GITHUB_OUTPUT
+      
 
       - name: Configure AWS CLI for DEMO Account
         run: |
@@ -134,19 +151,22 @@ jobs:
         id: lt-version
         run: |
           VERSION=$(aws ec2 create-launch-template-version \
-            --launch-template-name "webapp-lt-aws-v120250409225953994200000006" \
+            --launch-template-name "${{ secrets.LAUNCH_TEMPLATE_NAME }}" \
             --source-version "\$Latest" \
             --version-description "From GitHub Actions - ${{ github.sha }}" \
-            --launch-template-data "{\"ImageId\":\"${{ steps.get-ami-id.outputs.AMI_ID }}\"}" \
+            --launch-template-data "{\"ImageId\":\"${{ steps.extract_ami.outputs.ami_id }}\"}" \
             --query 'LaunchTemplateVersion.VersionNumber' \
             --output text)
+          echo "VERSION=$VERSION"
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+      
 
       - name: Update Auto Scaling Group with New Launch Template Version
         run: |
           aws autoscaling update-auto-scaling-group \
             --auto-scaling-group-name "${{ secrets.ASG_NAME }}" \
-            --launch-template "LaunchTemplateName=webapp-lt-aws-v120250409225953994200000006,Version=${{ steps.lt-version.outputs.VERSION }}"
+            --launch-template "LaunchTemplateName=${{ secrets.LAUNCH_TEMPLATE_NAME }},Version=${{ steps.lt-version.outputs.VERSION }}"
+      
 
       - name: Start Instance Refresh
         id: refresh
