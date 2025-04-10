@@ -144,8 +144,8 @@ jobs:
     needs: build-ami
     runs-on: ubuntu-latest
     env:
-      ASG_NAME: webapp-autoscaling-group
-      LAUNCH_TEMPLATE_NAME: webapp-lt-aws-v120250409225953994200000006
+      ASG_NAME: ${{ secrets.ASG_NAME }}
+      LAUNCH_TEMPLATE_NAME: ${{ secrets.LAUNCH_TEMPLATE_NAME }}
       AMI_ID: ${{ needs.build-ami.outputs.ami_id }}
 
     steps:
