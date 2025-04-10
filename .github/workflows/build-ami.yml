@@ -58,6 +58,8 @@ jobs:
     name: build AMI image
     needs: build
     runs-on: ubuntu-latest
+    outputs:
+      ami_id: ${{ steps.extract_ami.outputs.ami_id }}
 
     steps:
       - name: Checkout Repository
@@ -137,6 +139,16 @@ jobs:
           echo "ami_id=$AMI_ID" >> $GITHUB_OUTPUT
       
 
+  deploy:
+    name: Deploy New AMI to ASG
+    needs: build-ami
+    runs-on: ubuntu-latest
+    env:
+      ASG_NAME: webapp-autoscaling-group
+      LAUNCH_TEMPLATE_NAME: webapp-lt-aws-v120250409225953994200000006
+      AMI_ID: ${{ needs.build-ami.outputs.ami_id }}
+
+    steps:
       - name: Configure AWS CLI for DEMO Account
         run: |
           aws configure set aws_access_key_id "${{ secrets.DEMO_AWS_ACCESS_KEY_ID }}"
@@ -145,58 +157,53 @@ jobs:
 
       - name: Debug Launch Template Name
         run: |
-          echo "LT name: ${{ secrets.LAUNCH_TEMPLATE_NAME }}"
+          echo "LT name: $LAUNCH_TEMPLATE_NAME"
 
       - name: Create New Launch Template Version
-        id: lt-version
+        id: create_lt_version
         run: |
-          VERSION=$(aws ec2 create-launch-template-version \
-            --launch-template-name "${{ secrets.LAUNCH_TEMPLATE_NAME }}" \
-            --source-version "\$Latest" \
-            --version-description "From GitHub Actions - ${{ github.sha }}" \
-            --launch-template-data "{\"ImageId\":\"${{ steps.extract_ami.outputs.ami_id }}\"}" \
-            --query 'LaunchTemplateVersion.VersionNumber' \
-            --output text)
-          echo "VERSION=$VERSION"
-          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
-      
+            echo "Creating new launch template version with AMI ${{ env.AMI_ID }}..."
+            NEW_LT_VERSION=$(aws ec2 create-launch-template-version \
+              --launch-template-name $LAUNCH_TEMPLATE_NAME \
+              --source-version '$Latest' \
+              --launch-template-data "{\"ImageId\":\"${{ env.AMI_ID }}\"}" \
+              --query 'LaunchTemplateVersion.VersionNumber' --output text)
+            echo "New launch template version: $NEW_LT_VERSION"
+            echo "lt_version=$NEW_LT_VERSION" >> $GITHUB_OUTPUT
 
-      - name: Update Auto Scaling Group with New Launch Template Version
+      - name: Update Auto Scaling Group to Use New Launch Template Version
         run: |
-          aws autoscaling update-auto-scaling-group \
-            --auto-scaling-group-name "${{ secrets.ASG_NAME }}" \
-            --launch-template "LaunchTemplateName=${{ secrets.LAUNCH_TEMPLATE_NAME }},Version=${{ steps.lt-version.outputs.VERSION }}"
-      
+            aws autoscaling update-auto-scaling-group \
+              --auto-scaling-group-name $ASG_NAME \
+              --launch-template "LaunchTemplateName=$LAUNCH_TEMPLATE_NAME,Version=${{ steps.create_lt_version.outputs.lt_version }}"
 
-      - name: Start Instance Refresh
-        id: refresh
+      - name: Start Instance Refresh on ASG
+        id: start_instance_refresh
         run: |
-          INSTANCE_REFRESH_ID=$(aws autoscaling start-instance-refresh \
-            --auto-scaling-group-name "${{ secrets.ASG_NAME }}" \
-            --strategy Rolling \
-            --query 'InstanceRefreshId' --output text)
-          echo "INSTANCE_REFRESH_ID=$INSTANCE_REFRESH_ID" >> $GITHUB_OUTPUT
-
+            REFRESH_ID=$(aws autoscaling start-instance-refresh \
+              --auto-scaling-group-name $ASG_NAME \
+              --preferences '{"MinHealthyPercentage":90,"InstanceWarmup":60}' \
+              --query 'InstanceRefreshId' --output text)
+            echo "Instance refresh initiated with ID: $REFRESH_ID"
+            echo "refresh_id=$REFRESH_ID" >> $GITHUB_OUTPUT
 
       - name: Wait for Instance Refresh to Complete
         run: |
-          STATUS="InProgress"
-          while [ "$STATUS" == "InProgress" ]; do
+            REFRESH_ID=${{ steps.start_instance_refresh.outputs.refresh_id }}
+            echo "Waiting for instance refresh with ID: $REFRESH_ID to complete..."
             STATUS=$(aws autoscaling describe-instance-refreshes \
-              --auto-scaling-group-name "${{ secrets.ASG_NAME }}" \
-              --instance-refresh-ids "${{ steps.refresh.outputs.INSTANCE_REFRESH_ID }}" \
-              --query 'InstanceRefreshes[0].Status' \
-              --output text)
-            echo "Current status: $STATUS"
-            sleep 20
-          done
-
-          if [ "$STATUS" != "Successful" ]; then
-            echo "❌ Instance refresh failed or was cancelled. Status: $STATUS"
-            exit 1
-          else
-            echo "✅ Instance refresh completed successfully."
-          fi
-
-
-
+              --auto-scaling-group-name $ASG_NAME \
+              --query "InstanceRefreshes[?InstanceRefreshId=='$REFRESH_ID'].Status" --output text)
+            echo "Initial refresh status: $STATUS"
+            while [[ "$STATUS" != "Successful" && "$STATUS" != "Failed" ]]; do
+              sleep 30
+              STATUS=$(aws autoscaling describe-instance-refreshes \
+                --auto-scaling-group-name $ASG_NAME \
+                --query "InstanceRefreshes[?InstanceRefreshId=='$REFRESH_ID'].Status" --output text)
+              echo "Current refresh status: $STATUS"
+            done
+            echo "Final instance refresh status: $STATUS"
+            if [ "$STATUS" != "Successful" ]; then
+              echo "Instance refresh failed!"
+              exit 1
+            fi
