@@ -14,4 +14,13 @@ The Repository contains a health check Api which is used to check the running st
 5. Now click Apply and then ok.
 6. Click run application button to run the application.
 
+## To create certificate in AWS certificate manager
+## Go inside the folder that has the certificate and run this command
+aws acm import-certificate \
+--certificate fileb://certificate.crt \
+--private-key fileb://private.key \
+--certificate-chain fileb://ca_bundle.crt \
+--region us-east-1
 
+
+### Once the command is run successfully copy the arn of certificate and update the tfvars
