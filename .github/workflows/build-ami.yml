@@ -128,12 +128,12 @@ jobs:
 
           # Check if AMI_ID was found
           if [ -z "$AMI_ID" ]; then
-            echo "❌ Error: AMI_ID is empty. Check packer_output.log." >&2
+            echo " Error: AMI_ID is empty. Check packer_output.log." >&2
             exit 1
           fi
 
           # Log the extracted AMI ID
-          echo "✅ Extracted AMI_ID: $AMI_ID"
+          echo " Extracted AMI_ID: $AMI_ID"
 
           # Set AMI ID as a GitHub Actions output
           echo "ami_id=$AMI_ID" >> $GITHUB_OUTPUT

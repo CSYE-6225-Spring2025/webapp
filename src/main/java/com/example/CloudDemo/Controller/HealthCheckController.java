@@ -48,7 +48,7 @@ public class HealthCheckController {
         }
         Timer.Sample dbSample = Timer.start(meterRegistry);
         try {
-            logger.info("Received GET request to /healthz endpoint");
+            logger.info("Received GET request to /healthz");
             meterRegistry.counter("api.calls", "endpoint", "/healthz", "method", "GET").increment();
             repository.save(new HealthCheck());
         } catch (Exception e) {
