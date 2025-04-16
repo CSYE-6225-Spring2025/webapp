@@ -61,6 +61,31 @@ public class HealthCheckController {
 
     }
 
+    @RequestMapping(path = "/cicd", method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.PATCH, RequestMethod.DELETE, RequestMethod.HEAD, RequestMethod.OPTIONS})
+    public ResponseEntity<Void> healthChecks(HttpServletRequest httpServletRequest) {
+        if (!"GET".equalsIgnoreCase(httpServletRequest.getMethod())) {
+            logger.info("Received BAD REQUEST for /healthz");
+            return createResponse(HttpStatus.METHOD_NOT_ALLOWED);
+        }
+        if (httpServletRequest.getContentLength() > 0 || !httpServletRequest.getParameterMap().isEmpty()) {
+            logger.info("Received BAD REQUEST for /healthz");
+            return createResponse(HttpStatus.BAD_REQUEST);
+        }
+        Timer.Sample dbSample = Timer.start(meterRegistry);
+        try {
+            logger.info("Received GET request to /healthz");
+            meterRegistry.counter("api.calls", "endpoint", "/healthz", "method", "GET").increment();
+            repository.save(new HealthCheck());
+        } catch (Exception e) {
+            logger.error("Error while saving healthCheck to DB", e);
+            return createResponse(HttpStatus.SERVICE_UNAVAILABLE);
+        }finally {
+            dbSample.stop(meterRegistry.timer("db.duration", "operation", "saveHealthCheck"));
+        }
+        return createResponse(HttpStatus.OK);
+
+    }
+
     private ResponseEntity<Void> createResponse(HttpStatus status) {
         return status(status)
                 .header("Cache-Control", "no-cache, no-store, must-revalidate")
